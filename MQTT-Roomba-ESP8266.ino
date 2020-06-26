@@ -115,6 +115,7 @@ void resetRobot()
 {
   Serial.write(7);
   delay(50);
+  client.publish("roomba/status", "Resetting");
 }
 
 void startCleaning()
@@ -162,7 +163,7 @@ void sendInfoRoomba()
   String temp_str = String(battery_Voltage);
   temp_str.toCharArray(battery_Current_mAh_send, temp_str.length() + 1); //packaging up the data to publish to mqtt
   client.publish("roomba/charging", battery_Current_mAh_send);
-  if(*battery_Current_mAh_send == 1 || *battery_Current_mAh_send == 2 || *battery_Current_mAh_send == 3) 
+  if(temp_str == "1" || temp_str == "2" || temp_str == "3") 
   {
     // 0 = not charging, 1: reconditioning, 2: normal charging, 3: trickle charging, 4: waiting, 5: error
     client.publish("roomba/status", "Docked");
@@ -211,12 +212,6 @@ void loop()
   ArduinoOTA.handle();
   if (!client.connected()) 
   {
-  digitalWrite(LED_BUILTIN, LOW);   // Turn the LED on by making the voltage LOW
-  delay(1000);
-  digitalWrite(LED_BUILTIN, HIGH);   // Turn the LED on by making the voltage LOW
-  digitalWrite(LED_BUILTIN, LOW);   // Turn the LED on by making the voltage LOW
-  delay(1000);
-  digitalWrite(LED_BUILTIN, HIGH);   // Turn the LED on by making the voltage LOW
     reconnect();
   }
   client.loop();
